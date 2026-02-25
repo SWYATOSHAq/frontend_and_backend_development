@@ -1,0 +1,12 @@
+/Users/user/rust_projects/rest_api/target/debug/deps/impl_more-72c674ffc64085af.d: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/as_ref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/deref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/display.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/error.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/from.rs
+
+/Users/user/rust_projects/rest_api/target/debug/deps/libimpl_more-72c674ffc64085af.rlib: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/as_ref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/deref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/display.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/error.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/from.rs
+
+/Users/user/rust_projects/rest_api/target/debug/deps/libimpl_more-72c674ffc64085af.rmeta: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/as_ref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/deref.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/display.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/error.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/from.rs
+
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/lib.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/as_ref.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/deref.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/display.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/error.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/impl-more-0.1.9/src/from.rs:
