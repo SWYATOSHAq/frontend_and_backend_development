@@ -2,6 +2,14 @@ use actix_web::{App, HttpResponse, HttpServer, Responder, web};
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use uuid::Uuid;
+use actix_cors::Cors;
+
+
+#[derive(Deserialize)]
+struct CreateProduct {
+    name: String,
+    price: f64,
+}
 
 #[derive(Deserialize, Serialize, Clone)]
 struct Product {
@@ -36,7 +44,8 @@ async fn get_product(path: web::Path<String>, data: web::Data<AppState>) -> impl
     }
 }
 
-async fn create_product(product: web::Json<Product>, data: web::Data<AppState>) -> impl Responder {
+
+async fn create_product(product: web::Json<CreateProduct>, data: web::Data<AppState>) -> impl Responder {
     let mut products = data.products.lock().unwrap();
 
     let new_product = Product {
@@ -44,7 +53,9 @@ async fn create_product(product: web::Json<Product>, data: web::Data<AppState>) 
         name: product.name.clone(),
         price: product.price,
     };
+
     products.push(new_product.clone());
+
     HttpResponse::Created().json(new_product)
 }
 
@@ -80,16 +91,22 @@ async fn main() -> std::io::Result<()> {
     });
 
     HttpServer::new(move || {
-        App::new()
-            .app_data(state.clone())
-            .route("/", web::get().to(index))
-            .route("/products", web::get().to(get_products))
-            .route("/products", web::post().to(create_product))
-            .route("/products/{id}", web::get().to(get_product))
-            .route("/products/{id}", web::patch().to(update_product))
-            .route("/products/{id}", web::delete().to(delete_product))
-    })
-    .bind(("127.0.0.1", 3000))?
-    .run()
-    .await
+    App::new()
+        .app_data(state.clone())
+        .wrap(
+            Cors::default()
+                .allow_any_origin()
+                .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
+                .allowed_headers(vec!["Content-Type"])
+        )
+        .route("/", web::get().to(index))
+        .route("/products", web::get().to(get_products))
+        .route("/products", web::post().to(create_product))
+        .route("/products/{id}", web::get().to(get_product))
+        .route("/products/{id}", web::patch().to(update_product))
+        .route("/products/{id}", web::delete().to(delete_product))
+})
+.bind(("127.0.0.1", 3000))?
+.run()
+.await
 }
