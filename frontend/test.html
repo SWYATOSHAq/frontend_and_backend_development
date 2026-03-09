@@ -9,19 +9,94 @@
 
 <body>
 
-<h2>Добавить продукт</h2>
+    <div class="layout">
 
-<div class="form">
-    <input id="name" placeholder="Название">
-    <input id="price" placeholder="Цена" type="number">
-    <button onclick="createProduct()">Добавить</button>
-</div>
+        <!-- Боковая панель: добавление товара -->
+        <aside class="sidebar">
+            <div class="sidebar__header">
+                <h2 class="sidebar__title">Добавить товар</h2>
+            </div>
+            <form class="sidebar__form" onsubmit="createProduct(event)">
+                <div class="form-group">
+                    <label class="form-label">Название</label>
+                    <input id="name" class="form-input" placeholder="Введите название" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Цена (€)</label>
+                    <input id="price" class="form-input" placeholder="0.00" type="number" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Количество на складе</label>
+                    <input id="quantity" class="form-input" placeholder="0" type="number" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <input id="category" class="form-input" placeholder="Введите категорию" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea id="description" class="form-input form-textarea" placeholder="Введите описание товара"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Фото товара (PNG)</label>
+                    <label class="file-upload" id="file-upload-label">
+                        <input id="image" type="file" accept=".png,image/png" onchange="previewImage(this)">
+                        <span id="file-upload-text">Выбрать файл PNG</span>
+                    </label>
+                    <img id="image-preview" class="image-preview" src="" alt="" style="display:none;">
+                </div>
+                <button type="submit" class="btn btn--add">+ Добавить товар</button>
+            </form>
+        </aside>
 
-<hr>
+        <!-- Основной контент: карточки товаров -->
+        <main class="main">
+            <header class="main__header">
+                <h1 class="main__title">Каталог товаров</h1>
+                <span id="products-count" class="main__count"></span>
+            </header>
+            <div id="products-container" class="products-grid"></div>
+        </main>
 
-<div id="products-container"></div>
+    </div>
 
-<script src="script/app.js"></script>
+    <!-- Модальное окно редактирования -->
+    <div id="edit-modal" class="modal">
+        <div class="modal__overlay" onclick="closeModal()"></div>
+        <div class="modal__content">
+            <button class="modal__close" onclick="closeModal()">✕</button>
+            <h2 class="modal__title">Редактировать товар</h2>
+            <input type="hidden" id="edit-id">
+            <div class="modal__form">
+                <div class="form-group">
+                    <label class="form-label">Название</label>
+                    <input id="edit-name" class="form-input" placeholder="Название">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Цена (€)</label>
+                    <input id="edit-price" class="form-input" placeholder="0.00" type="number" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Количество на складе</label>
+                    <input id="edit-quantity" class="form-input" placeholder="0" type="number" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Категория</label>
+                    <input id="edit-category" class="form-input" placeholder="Категория">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea id="edit-description" class="form-input form-textarea" placeholder="Описание товара"></textarea>
+                </div>
+            </div>
+            <div class="modal__actions">
+                <button class="btn btn--save" onclick="saveProduct()">Сохранить</button>
+                <button class="btn btn--cancel" onclick="closeModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script/app.js"></script>
 
 </body>
 </html>

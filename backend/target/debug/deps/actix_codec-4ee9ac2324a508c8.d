@@ -1,0 +1,10 @@
+/Users/user/Фронтенд и Бекенд разработка/practice#1a2/backend/target/debug/deps/actix_codec-4ee9ac2324a508c8.d: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/bcodec.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/framed.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lines.rs
+
+/Users/user/Фронтенд и Бекенд разработка/practice#1a2/backend/target/debug/deps/libactix_codec-4ee9ac2324a508c8.rlib: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/bcodec.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/framed.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lines.rs
+
+/Users/user/Фронтенд и Бекенд разработка/practice#1a2/backend/target/debug/deps/libactix_codec-4ee9ac2324a508c8.rmeta: /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lib.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/bcodec.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/framed.rs /Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lines.rs
+
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lib.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/bcodec.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/framed.rs:
+/Users/user/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/actix-codec-0.5.2/src/lines.rs:
