@@ -131,8 +131,30 @@ async function openEditModal(id) {
     document.getElementById("edit-quantity").value = product.quantity;
     document.getElementById("edit-category").value = product.category || "";
     document.getElementById("edit-description").value = product.description || "";
+    document.getElementById("edit-current-image").value = product.image_url || "";
+    document.getElementById("edit-image").value = "";
+
+    const preview = document.getElementById("edit-image-preview");
+    if (product.image_url) {
+        preview.src = `http://127.0.0.1:3000${product.image_url}`;
+        preview.style.display = "block";
+    } else {
+        preview.style.display = "none";
+    }
 
     document.getElementById("edit-modal").classList.add("modal--open");
+}
+
+function previewEditImage(input) {
+    const preview = document.getElementById("edit-image-preview");
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 }
 
 function closeModal() {
@@ -146,16 +168,27 @@ async function saveProduct() {
     const quantity = parseInt(document.getElementById("edit-quantity").value);
     const category = document.getElementById("edit-category").value.trim();
     const description = document.getElementById("edit-description").value.trim();
+    const fileInput = document.getElementById("edit-image");
 
     if (!name || isNaN(price) || isNaN(quantity)) {
         alert("Заполните обязательные поля: Название, Цена, Количество");
         return;
     }
 
+    let image_url = document.getElementById("edit-current-image").value || null;
+
+    if (fileInput.files[0]) {
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        const uploadRes = await fetch(UPLOAD, { method: "POST", body: formData });
+        const uploadData = await uploadRes.json();
+        image_url = uploadData.url;
+    }
+
     await fetch(`${API}/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, price, quantity, category, description })
+        body: JSON.stringify({ name, price, quantity, category, description, image_url })
     });
 
     closeModal();

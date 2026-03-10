@@ -41,7 +41,6 @@
                     <label class="form-label">Фото товара (PNG)</label>
                     <label class="file-upload" id="file-upload-label">
                         <input id="image" type="file" accept=".png,image/png" onchange="previewImage(this)">
-                        <span id="file-upload-text">Выбрать файл PNG</span>
                     </label>
                     <img id="image-preview" class="image-preview" src="" alt="" style="display:none;">
                 </div>
@@ -87,6 +86,12 @@
                 <div class="form-group">
                     <label class="form-label">Описание</label>
                     <textarea id="edit-description" class="form-input form-textarea" placeholder="Описание товара"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Картинка</label>
+                    <input type="hidden" id="edit-current-image">
+                    <input id="edit-image" type="file" accept=".png,image/png" onchange="previewEditImage(this)">
+                    <img id="edit-image-preview" class="image-preview" src="" alt="" style="display:none; margin-top:8px;">
                 </div>
             </div>
             <div class="modal__actions">
