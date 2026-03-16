@@ -1,41 +1,108 @@
 use actix_web::{web, HttpResponse, Responder};
 use uuid::Uuid;
 use crate::state::AppState;
-use crate::models::{CreateUserRequest, ErrorResponse, UpdateUserRequest, User};
+use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
 
 //GET /api/users -список всех пользователей-
 #[utoipa::path
     (get, path ="/api/users",
-    responses((status = 200, description ="Список пользователей", body = Vec<User>)),
-    tag ="Users")]
+    responses(
+        (status = 200, description ="Список пользователей", body = Vec<User>)
+    ),
+    tag ="Users"
+)]
 pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
     let users = data.users.lock().unwrap();
     HttpResponse::Ok().json(users.clone())
 }
 
-//POST /api/users -создание нового пользователя-
+pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
+    let cost = 10;
+    bcrypt::hash(password, cost)
+}
+
+pub fn verify_password(password: &str, password_hash: &str) -> Result<bool, bcrypt::BcryptError> {
+    bcrypt::verify(password, password_hash)
+}
+
+//POST /api/users/register -регистрация нового пользователя-
 #[utoipa::path(
-    post, path ="/api/users",
-    request_body = CreateUserRequest,
+    post, path ="/api/users/register",
+    request_body = RegisterRequest,
     responses(
-    (status = 201, description ="Пользователь успешно создан", body = User),
-    (status = 400, description = "Ошибка в теле запроса", body = ErrorResponse)),
+    (status = 201, description ="Пользователь создан", body = User),
+    (status = 400, description = "Некорректные данные", body = ErrorResponse)
+),
     tag ="Users"
 )]
-pub async fn create_user(
-    user: web::Json<CreateUserRequest>,
+pub async fn register_user(
+    user: web::Json<RegisterRequest>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let mut users = data.users.lock().unwrap();
-
+    if user.username.is_empty() || user.password.is_empty() || user.age == 0 {
+        return HttpResponse::BadRequest().json(ErrorResponse {
+            error: "Некорректные данные".to_string(),
+        });
+    }
+    {
+        let users = data.users.lock().unwrap();
+        if users.iter().any(|u| u.username == user.username) {
+            return HttpResponse::BadRequest().json(ErrorResponse {
+                error: "Пользователь с таким именем уже существует".to_string(),
+            });
+        }
+    }
     let new_user = User {
         id: Uuid::new_v4().to_string(),
-        name: user.name.clone(),
+        username: user.username.trim().to_string(),
         age: user.age,
+        hashed_password: match hash_password(&user.password) {
+            Ok(hash) => hash,
+            Err(_) => return HttpResponse::InternalServerError().json(ErrorResponse {
+                error: "Ошибка при хешировании пароля".to_string(),
+            }),
+        }
     };
-
-    users.push(new_user.clone());
+    data.users.lock().unwrap().push(new_user.clone());
     HttpResponse::Created().json(new_user)
+}
+
+//POST /api/users/login -аутентификация пользователя-
+#[utoipa::path(
+    post, path ="/api/users/login",
+    request_body = LoginRequest,
+    responses(
+    (status = 200, description ="Успешный вход", body = LoginResponse),
+    (status = 400, description = "Некорректные данные", body = ErrorResponse),
+    (status = 401, description = "Неверные имя пользователя или пароль", body = ErrorResponse),
+    (status = 404, description = "Пользователь не найден", body = ErrorResponse)
+    ),
+    tag = "Users"
+)]
+pub async fn login_user(
+    credentials: web::Json<LoginRequest>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    if credentials.username.is_empty() || credentials.password.is_empty() {
+        return HttpResponse::BadRequest().json(ErrorResponse {
+            error: "Некорректные данные".to_string(),
+        });
+    }
+    let users = data.users.lock().unwrap();
+    match users.iter().find(|u| u.username == credentials.username) {
+        Some(user) => match verify_password(&credentials.password, &user.hashed_password) {
+            Ok(true) => HttpResponse::Ok().json(LoginResponse { login: true }),
+            Ok(false) => HttpResponse::Unauthorized().json(ErrorResponse {
+                error: "Неверные имя пользователя или пароль".to_string(),
+            }),
+            Err(_) => HttpResponse::InternalServerError().json(ErrorResponse {
+                error: "Ошибка при проверке пароля".to_string(),
+            }),
+        },
+        None => HttpResponse::NotFound().json(ErrorResponse {
+            error: "Пользователь не найден".to_string(),
+        }),
+    }
 }
 
 //GET /api/users/{id} -получение данных пользователя по ID-
@@ -79,17 +146,17 @@ pub async fn update_user(
     path: web::Path<String>,
     body: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
-    if body.name.is_none() && body.age.is_none() {
+    if body.username.is_none() && body.age.is_none() {
         return HttpResponse::BadRequest().json(ErrorResponse {
-            error: "Nothing to update".into(),
+            error: "Нет данных для обновления".into(),
         });
     }
     let id = path.into_inner();
     let mut users = data.users.lock().unwrap();
     match users.iter_mut().find(|u| u.id == id) {
         Some(user) => {
-            if let Some(name) = &body.name {
-                user.name = name.trim().to_string();
+            if let Some(username) = &body.username {
+                user.username = username.trim().to_string();
             }
             if let Some(age) = body.age {
                 user.age = age;
@@ -97,7 +164,7 @@ pub async fn update_user(
             HttpResponse::Ok().json(user.clone())
         }
         None => HttpResponse::NotFound().json(ErrorResponse {
-            error: "User not found".into(),
+            error: "Пользователь не найден".into(),
         }),
     }
 }

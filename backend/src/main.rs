@@ -15,14 +15,15 @@ use state::AppState;
 #[openapi(
     paths(
         handlers::users_handlers::get_users,
-        handlers::users_handlers::create_user,
+        handlers::users_handlers::register_user,
+        handlers::users_handlers::login_user,
         handlers::users_handlers::get_user_by_id,
         handlers::users_handlers::update_user,
         handlers::users_handlers::delete_user,
     ),
     components(schemas(
         models::user::User,
-        models::user::CreateUserRequest,
+        models::user::RegisterRequest,
         models::user::UpdateUserRequest,
         models::user::ErrorResponse,
     )),

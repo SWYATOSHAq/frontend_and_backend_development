@@ -12,7 +12,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .route("/products/{id}", web::delete().to(products::delete_product))
         // Users
         .route("/api/users", web::get().to(users::get_users))
-        .route("/api/users", web::post().to(users::create_user))
+        .route("/api/users/register", web::post().to(users::register_user))
+        .route("/api/users/login", web::post().to(users::login_user))
         .route("/api/users/{id}", web::get().to(users::get_user_by_id))
         .route("/api/users/{id}", web::patch().to(users::update_user))
         .route("/api/users/{id}", web::delete().to(users::delete_user))
