@@ -8,6 +8,7 @@ mod handlers;
 mod models;
 mod routes;
 mod state;
+mod utils;
 
 use state::AppState;
 

@@ -2,6 +2,8 @@ use actix_web::{web, HttpResponse, Responder};
 use uuid::Uuid;
 use crate::state::AppState;
 use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
+use crate::utils::hash::{hash_password, verify_password};
+use validator::Validate;
 
 //GET /api/users -список всех пользователей-
 #[utoipa::path
@@ -14,15 +16,6 @@ use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse,
 pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
     let users = data.users.lock().unwrap();
     HttpResponse::Ok().json(users.clone())
-}
-
-pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
-    let cost = 10;
-    bcrypt::hash(password, cost)
-}
-
-pub fn verify_password(password: &str, password_hash: &str) -> Result<bool, bcrypt::BcryptError> {
-    bcrypt::verify(password, password_hash)
 }
 
 //POST /api/users/register -регистрация нового пользователя-
@@ -39,6 +32,11 @@ pub async fn register_user(
     user: web::Json<RegisterRequest>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    if let Err(e) = user.validate() {
+        return HttpResponse::BadRequest().json(ErrorResponse {
+            error: e.to_string(),
+        });
+    }
     if user.username.is_empty() || user.password.is_empty() || user.age == 0 {
         return HttpResponse::BadRequest().json(ErrorResponse {
             error: "Некорректные данные".to_string(),
@@ -56,6 +54,7 @@ pub async fn register_user(
         id: Uuid::new_v4().to_string(),
         username: user.username.trim().to_string(),
         age: user.age,
+        email: user.email.trim().to_string(),
         hashed_password: match hash_password(&user.password) {
             Ok(hash) => hash,
             Err(_) => return HttpResponse::InternalServerError().json(ErrorResponse {
@@ -83,6 +82,11 @@ pub async fn login_user(
     credentials: web::Json<LoginRequest>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    if let Err(e) = credentials.validate() {
+        return HttpResponse::BadRequest().json(ErrorResponse {
+            error: e.to_string(),
+        });
+    }
     if credentials.username.is_empty() || credentials.password.is_empty() {
         return HttpResponse::BadRequest().json(ErrorResponse {
             error: "Некорректные данные".to_string(),
