@@ -1,7 +1,8 @@
-use actix_web::{HttpResponse, Responder, web};
+use actix_web::{HttpResponse, HttpRequest, Responder, web};
 use uuid::Uuid;
 use crate::models::{CreateProduct, Product, UpdateProduct};
 use crate::state::AppState;
+use crate::handlers::auth_handlers::extract_claims;
 
 /*pub async fn index() -> impl Responder {
     HttpResponse::Ok()
@@ -14,7 +15,10 @@ pub async fn get_products(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().json(products.clone())
 }
 
-pub async fn get_product(path: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+pub async fn get_product(req: HttpRequest, path: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    if let Err(resp) = extract_claims(&req) {
+        return resp;
+    }
     let id = path.into_inner();
     let products = data.products.lock().unwrap();
 
@@ -46,10 +50,14 @@ pub async fn create_product(
 }
 
 pub async fn update_product(
+    req: HttpRequest,
     path: web::Path<String>,
     update: web::Json<UpdateProduct>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    if let Err(resp) = extract_claims(&req) {
+        return resp;
+    }
     let id = path.into_inner();
     let mut products = data.products.lock().unwrap();
 
@@ -69,9 +77,13 @@ pub async fn update_product(
 }
 
 pub async fn delete_product(
+    req: HttpRequest,
     path: web::Path<String>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    if let Err(resp) = extract_claims(&req) {
+        return resp;
+    }
     let id = path.into_inner();
     let mut products = data.products.lock().unwrap();
 

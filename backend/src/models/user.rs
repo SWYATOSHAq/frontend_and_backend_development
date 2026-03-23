@@ -37,7 +37,18 @@ pub struct UpdateUserRequest {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct LoginResponse { pub login: bool, }
+pub struct LoginResponse {
+    pub login: bool,
+    pub access_token: String,
+}
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorResponse { pub error: String,}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct UserResponse {
+    pub id: String,
+    pub username: String,
+    pub age: u32,
+    pub email: String,
+}

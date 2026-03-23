@@ -1,6 +1,6 @@
 use actix_files::Files;
 use actix_web::web;
-use crate::handlers::{products_handlers as products, users_handlers as users, upload};
+use crate::handlers::{products_handlers as products, users_handlers as users, upload, auth_handlers as auth};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg
@@ -17,6 +17,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .route("/api/users/{id}", web::get().to(users::get_user_by_id))
         .route("/api/users/{id}", web::patch().to(users::update_user))
         .route("/api/users/{id}", web::delete().to(users::delete_user))
+        // Auth
+        .route("/api/auth/me", web::get().to(auth::get_me))
         // Upload
         .route("/upload", web::post().to(upload::upload_image))
         .service(Files::new("/uploads", "uploads"));

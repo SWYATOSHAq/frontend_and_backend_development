@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
                 Cors::default()
                     .allow_any_origin()
                     .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
-                    .allowed_headers(vec!["Content-Type"]),
+                    .allowed_headers(vec!["Content-Type", "Authorization"]),
             )
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")

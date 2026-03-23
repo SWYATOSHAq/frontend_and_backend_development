@@ -2,7 +2,8 @@ use actix_web::{web, HttpResponse, Responder};
 use uuid::Uuid;
 use crate::state::AppState;
 use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
-use crate::utils::hash::{hash_password, verify_password};
+use crate::utils::hash_fn::{hash_password, verify_password};
+use crate::utils::jwt_fn::create_token;
 use validator::Validate;
 
 //GET /api/users -список всех пользователей-
@@ -95,7 +96,10 @@ pub async fn login_user(
     let users = data.users.lock().unwrap();
     match users.iter().find(|u| u.username == credentials.username) {
         Some(user) => match verify_password(&credentials.password, &user.hashed_password) {
-            Ok(true) => HttpResponse::Ok().json(LoginResponse { login: true }),
+            Ok(true) => {
+                let token = create_token(user).unwrap();
+                HttpResponse::Ok().json(LoginResponse { login: true, access_token: token })
+            }
             Ok(false) => HttpResponse::Unauthorized().json(ErrorResponse {
                 error: "Неверные имя пользователя или пароль".to_string(),
             }),
@@ -107,6 +111,7 @@ pub async fn login_user(
             error: "Пользователь не найден".to_string(),
         }),
     }
+
 }
 
 //GET /api/users/{id} -получение данных пользователя по ID-
