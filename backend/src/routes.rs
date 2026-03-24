@@ -19,6 +19,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .route("/api/users/{id}", web::delete().to(users::delete_user))
         // Auth
         .route("/api/auth/me", web::get().to(auth::get_me))
+        .route("/api/auth/refresh", web::post().to(auth::refresh_token))
         // Upload
         .route("/upload", web::post().to(upload::upload_image))
         .service(Files::new("/uploads", "uploads"));

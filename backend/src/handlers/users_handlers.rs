@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::state::AppState;
 use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
 use crate::utils::hash_fn::{hash_password, verify_password};
-use crate::utils::jwt_fn::create_token;
+use crate::utils::jwt_fn::{create_access_token, create_refresh_token};
 use validator::Validate;
 
 //GET /api/users -список всех пользователей-
@@ -97,8 +97,22 @@ pub async fn login_user(
     match users.iter().find(|u| u.username == credentials.username) {
         Some(user) => match verify_password(&credentials.password, &user.hashed_password) {
             Ok(true) => {
-                let token = create_token(user).unwrap();
-                HttpResponse::Ok().json(LoginResponse { login: true, access_token: token })
+                let access_token = match create_access_token(user) {
+                    Ok(token) => token,
+                    Err(_) => return HttpResponse::InternalServerError().json(ErrorResponse {
+                        error: "Ошибка при создании токена".to_string(),
+                    }),
+                };
+                let refresh_token = match create_refresh_token(user) {
+                    Ok(token) => token,
+                    Err(_) => return HttpResponse::InternalServerError().json(ErrorResponse {
+                        error: "Ошибка при создании токена".to_string(),
+                    }),
+                };
+                HttpResponse::Ok().json(LoginResponse {
+                    access_token,
+                    refresh_token,
+                })
             }
             Ok(false) => HttpResponse::Unauthorized().json(ErrorResponse {
                 error: "Неверные имя пользователя или пароль".to_string(),

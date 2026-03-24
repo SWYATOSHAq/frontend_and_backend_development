@@ -9,6 +9,13 @@ pub struct Claims {
     pub exp: usize,  // время истечения (as a timestamp)
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct RefreshClaims {
+    pub sub: String, // Subject (user ID)
+    pub iat: usize,  // время выдачи (as a timestamp)
+    pub exp: usize,  // время истечения (as a timestamp)
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 pub struct TokenResponse {
     #[serde(rename = "accessToken")]
