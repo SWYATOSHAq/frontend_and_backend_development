@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Rust build artifacts
+backend/target/
+
+# Node.js
+frontend-react/node_modules/
+frontend-react/dist/
+
+# Uploads (загруженные файлы)
+backend/uploads/
+
+# VS Code
+.vscode/
+
+# Environment variables
+.env
+.env.local
