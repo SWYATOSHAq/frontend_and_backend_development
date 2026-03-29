@@ -38,8 +38,6 @@ pub struct UpdateUserRequest {
 
 #[derive(Serialize, ToSchema)]
 pub struct LoginResponse {
-    #[serde(rename = "refreshToken")]
-    pub refresh_token: String,
     #[serde(rename = "accessToken")]
     pub access_token: String,
 }

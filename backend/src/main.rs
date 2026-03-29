@@ -46,9 +46,10 @@ async fn main() -> std::io::Result<()> {
             .app_data(state.clone())
             .wrap(
                 Cors::default()
-                    .allow_any_origin()
-                    .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
-                    .allowed_headers(vec!["Content-Type", "Authorization"]),
+                    .allowed_origin("http://localhost:5173")
+                    .allowed_methods(vec!["GET", "POST", "PATCH", "PUT", "DELETE"])
+                    .allowed_headers(vec!["Content-Type", "Authorization", "accept"])
+                    .supports_credentials(),
             )
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")

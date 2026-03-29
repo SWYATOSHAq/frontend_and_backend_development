@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
+use actix_web::cookie::{Cookie, SameSite};
 use uuid::Uuid;
 use crate::state::AppState;
 use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
@@ -67,7 +68,7 @@ pub async fn register_user(
     HttpResponse::Created().json(new_user)
 }
 
-//POST /api/users/login -аутентификация пользователя-
+//POST ]'/b -аутентификация пользователя-
 #[utoipa::path(
     post, path ="/api/users/login",
     request_body = LoginRequest,
@@ -109,10 +110,15 @@ pub async fn login_user(
                         error: "Ошибка при создании токена".to_string(),
                     }),
                 };
-                HttpResponse::Ok().json(LoginResponse {
-                    access_token,
-                    refresh_token,
-                })
+                let cookie = Cookie::build("refreshToken", refresh_token)
+                    .http_only(true)
+                    .secure(false)
+                    .same_site(SameSite::Lax)
+                    .path("/")
+                    .finish();
+                HttpResponse::Ok()
+                    .cookie(cookie)
+                    .json(LoginResponse { access_token })
             }
             Ok(false) => HttpResponse::Unauthorized().json(ErrorResponse {
                 error: "Неверные имя пользователя или пароль".to_string(),
