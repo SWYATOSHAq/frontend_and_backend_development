@@ -12,6 +12,7 @@ pub fn create_access_token(user: &User) -> Result<String, jsonwebtoken::errors::
     let claims = Claims {
         sub: user.id.clone(),
         username: user.username.clone(),
+        role: user.role.clone(),
         iat: now.timestamp() as usize,
         exp: (now + Duration::minutes(ACCESS_EXPIRES_MIN)).timestamp() as usize,
     };

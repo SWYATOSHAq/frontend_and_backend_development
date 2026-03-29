@@ -1,10 +1,11 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, HttpRequest, Responder};
 use actix_web::cookie::{Cookie, SameSite};
 use uuid::Uuid;
 use crate::state::AppState;
 use crate::models::{LoginRequest, RegisterRequest, LoginResponse, ErrorResponse, UpdateUserRequest, User};
 use crate::utils::hash_fn::{hash_password, verify_password};
 use crate::utils::jwt_fn::{create_access_token, create_refresh_token};
+use crate::handlers::auth_handlers::{extract_claims, require_role};
 use validator::Validate;
 
 //GET /api/users -список всех пользователей-
@@ -15,7 +16,14 @@ use validator::Validate;
     ),
     tag ="Users"
 )]
-pub async fn get_users(data: web::Data<AppState>) -> impl Responder {
+pub async fn get_users(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["admin"]) {
+        return resp;
+    }
     let users = data.users.lock().unwrap();
     HttpResponse::Ok().json(users.clone())
 }
@@ -62,7 +70,8 @@ pub async fn register_user(
             Err(_) => return HttpResponse::InternalServerError().json(ErrorResponse {
                 error: "Ошибка при хешировании пароля".to_string(),
             }),
-        }
+        },
+        role: user.role.clone().unwrap_or_else(|| "user".to_string()),
     };
     data.users.lock().unwrap().push(new_user.clone());
     HttpResponse::Created().json(new_user)
@@ -145,9 +154,17 @@ pub async fn login_user(
     tag = "Users"
 )]
 pub async fn get_user_by_id(
+    req: HttpRequest,
     data: web::Data<AppState>,
     path: web::Path<String>,
 ) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["admin"]) {
+        return resp;
+    }
     let id = path.into_inner();
     let users = data.users.lock().unwrap();
     match users.iter().find(|u| u.id == id) {
@@ -171,10 +188,18 @@ pub async fn get_user_by_id(
     tag = "Users"
 )]
 pub async fn update_user(
+    req: HttpRequest,
     data: web::Data<AppState>,
     path: web::Path<String>,
     body: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["admin"]) {
+        return resp;
+    }
     if body.username.is_none() && body.age.is_none() {
         return HttpResponse::BadRequest().json(ErrorResponse {
             error: "Нет данных для обновления".into(),
@@ -209,9 +234,17 @@ pub async fn update_user(
     tag = "Users"
 )]
 pub async fn delete_user(
+    req: HttpRequest,
     data: web::Data<AppState>,
     path: web::Path<String>,
 ) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["admin"]) {
+        return resp;
+    }
     let id = path.into_inner();
     let mut users = data.users.lock().unwrap();
     let len_before = users.len();

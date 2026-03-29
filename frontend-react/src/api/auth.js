@@ -5,7 +5,11 @@ export const register = (data) =>
 
 export const login = async (data) => {
   const response = await apiClient.post("/auth/login", data);
-  localStorage.setItem("accessToken", response.data.accessToken);
+  const token = response.data.accessToken;
+  localStorage.setItem("accessToken", token);
+  // декодируем payload токена и сохраняем роль
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  localStorage.setItem("role", payload.role);
   return response;
 };
 
@@ -17,4 +21,7 @@ export const getMe = () =>
 
 export const logout = () => {
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("role");
 };
+
+export const getRole = () => localStorage.getItem("role") || "";

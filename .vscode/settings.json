@@ -1,0 +1,7 @@
+{
+    "liveServer.settings.ignoreFiles": [
+        "backend/target/**",
+        "**/.DS_Store"
+    ],
+    "liveServer.settings.root": "/frontend"
+}

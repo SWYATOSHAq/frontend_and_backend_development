@@ -4,6 +4,15 @@ use crate::utils::jwt_fn::{verify_access_token, verify_refresh_token, create_acc
 use crate::models::{Claims, ErrorResponse, LoginResponse};
 use crate::state::AppState;
 
+pub fn require_role(claims: &Claims, allowed: &[&str]) -> Result<(), HttpResponse> {
+    if !allowed.contains(&claims.role.as_str()) {
+        return Err(HttpResponse::Forbidden().json(ErrorResponse {
+            error: "Forbidden".to_string(),
+        }));
+    }
+    Ok(())
+}
+
 pub fn extract_claims(request: &HttpRequest) -> Result<Claims, HttpResponse> {
     let headers = request
         .headers()
@@ -25,17 +34,19 @@ pub fn extract_claims(request: &HttpRequest) -> Result<Claims, HttpResponse> {
 }
 
 pub async fn get_me(request: HttpRequest, data: web::Data<AppState>) -> impl Responder {
-    match extract_claims(&request) {
-        Ok(claims) => {
-            let users = data.users.lock().unwrap();
-            match users.iter().find(|u| u.id == claims.sub) {
-                Some(user) => HttpResponse::Ok().json(user),
-                None => HttpResponse::NotFound().json(ErrorResponse {
-                    error: "Пользователь не найден".into(),
-                }),
-            }
-        }
-        Err(resp) => resp,
+    let claims = match extract_claims(&request) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["user", "seller", "admin"]) {
+        return resp;
+    }
+    let users = data.users.lock().unwrap();
+    match users.iter().find(|u| u.id == claims.sub) {
+        Some(user) => HttpResponse::Ok().json(user),
+        None => HttpResponse::NotFound().json(ErrorResponse {
+            error: "Пользователь не найден".into(),
+        }),
     }
 }
 

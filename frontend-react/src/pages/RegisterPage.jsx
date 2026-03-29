@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { register } from "../api/auth";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ username: "", password: "", age: "", email: "" });
+  const [form, setForm] = useState({ username: "", password: "", age: "", email: "", role: "user" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -72,6 +72,14 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Роль</label>
+            <select className="form-input" name="role" value={form.role} onChange={handleChange}>
+              <option value="user">Пользователь</option>
+              <option value="seller">Продавец</option>
+              <option value="admin">Администратор</option>
+            </select>
           </div>
           {error && <p className="error-text">{error}</p>}
           <button className="btn btn--add" type="submit">Зарегистрироваться</button>

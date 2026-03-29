@@ -13,6 +13,7 @@ pub struct User {
     pub email: String,
     #[serde(rename = "hashedPassword")]
     pub hashed_password: String,
+    pub role: String,
 }
 
 #[derive(Debug, Deserialize, ToSchema, Validate)]
@@ -22,6 +23,7 @@ pub struct RegisterRequest {
     pub age: u32,
     #[validate(email(message = "Invalid email format"))]
     pub email: String,
+    pub role: Option<String>,
 }
 
 #[derive(Debug, Deserialize, ToSchema, Validate)]
@@ -51,4 +53,5 @@ pub struct UserResponse {
     pub username: String,
     pub age: u32,
     pub email: String,
+    pub role: String,
 }

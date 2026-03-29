@@ -3,10 +3,11 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Claims {
-    pub sub: String, // Subject (user ID)
-    pub username: String, 
-    pub iat: usize,  // время выдачи (as a timestamp)
-    pub exp: usize,  // время истечения (as a timestamp)
+    pub sub: String,
+    pub username: String,
+    pub role: String,
+    pub iat: usize,
+    pub exp: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

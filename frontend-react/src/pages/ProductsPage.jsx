@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getProducts, createProduct, updateProduct, deleteProduct, uploadImage } from "../api/products";
-import { logout } from "../api/auth";
+import { logout, getRole } from "../api/auth";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -10,6 +10,7 @@ export default function ProductsPage() {
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
+  const role = getRole();
 
   const fetchProducts = async () => {
     try {
@@ -94,9 +95,9 @@ export default function ProductsPage() {
       {/* Sidebar — форма добавления */}
       <aside className="sidebar">
         <div className="sidebar__header">
-          <span className="sidebar__title">Добавить товар</span>
+          <span className="sidebar__title">{role === "user" ? "Каталог" : "Добавить товар"}</span>
         </div>
-        <form className="sidebar__form" onSubmit={handleSubmit}>
+        <form className="sidebar__form" onSubmit={handleSubmit} style={{ display: role === "user" ? "none" : "flex" }}>
           <div className="form-group">
             <label className="form-label">Название</label>
             <input
@@ -175,7 +176,12 @@ export default function ProductsPage() {
         <div className="main__header">
           <h1 className="main__title">Товары</h1>
           <span className="main__count">{products.length}</span>
-          <button className="btn btn--logout" style={{ marginLeft: "auto" }} onClick={handleLogout}>
+          {role === "admin" && (
+            <button className="btn btn--logout" onClick={() => navigate("/admin")} style={{ marginLeft: "auto", marginRight: 8 }}>
+              Панель админа
+            </button>
+          )}
+          <button className="btn btn--logout" style={{ marginLeft: role === "admin" ? 0 : "auto" }} onClick={handleLogout}>
             Выйти
           </button>
         </div>
@@ -204,14 +210,20 @@ export default function ProductsPage() {
                   <p className="card__description">{p.description}</p>
                   <p className="card__price">{p.price} ₽</p>
                 </div>
-                <div className="card__actions">
-                  <button className="btn btn--edit" onClick={() => handleEdit(p)}>
-                    Редактировать
-                  </button>
-                  <button className="btn btn--delete" onClick={() => handleDelete(p.id)}>
-                    Удалить
-                  </button>
-                </div>
+                {(role === "seller" || role === "admin") && (
+                  <div className="card__actions">
+                    {(role === "seller" || role === "admin") && (
+                      <button className="btn btn--edit" onClick={() => handleEdit(p)}>
+                        Редактировать
+                      </button>
+                    )}
+                    {role === "admin" && (
+                      <button className="btn btn--delete" onClick={() => handleDelete(p.id)}>
+                        Удалить
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))
           )}

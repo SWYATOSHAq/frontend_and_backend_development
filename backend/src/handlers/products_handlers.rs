@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, HttpRequest, Responder, web};
 use uuid::Uuid;
 use crate::models::{CreateProduct, Product, UpdateProduct};
 use crate::state::AppState;
-use crate::handlers::auth_handlers::extract_claims;
+use crate::handlers::auth_handlers::{extract_claims, require_role};
 
 /*pub async fn index() -> impl Responder {
     HttpResponse::Ok()
@@ -10,7 +10,14 @@ use crate::handlers::auth_handlers::extract_claims;
         .body("Главная страница")
 }*/
 
-pub async fn get_products(data: web::Data<AppState>) -> impl Responder {
+pub async fn get_products(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["user", "seller", "admin"]) {
+        return resp;
+    }
     let products = data.products.lock().unwrap();
     HttpResponse::Ok().json(products.clone())
 }
@@ -30,9 +37,17 @@ pub async fn get_product(req: HttpRequest, path: web::Path<String>, data: web::D
 }
 
 pub async fn create_product(
+    req: HttpRequest,
     product: web::Json<CreateProduct>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["seller", "admin"]) {
+        return resp;
+    }
     let mut products = data.products.lock().unwrap();
 
     let new_product = Product {
@@ -55,7 +70,11 @@ pub async fn update_product(
     update: web::Json<UpdateProduct>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    if let Err(resp) = extract_claims(&req) {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["seller", "admin"]) {
         return resp;
     }
     let id = path.into_inner();
@@ -81,7 +100,11 @@ pub async fn delete_product(
     path: web::Path<String>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    if let Err(resp) = extract_claims(&req) {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["admin"]) {
         return resp;
     }
     let id = path.into_inner();
