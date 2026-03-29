@@ -4,11 +4,6 @@ use crate::models::{CreateProduct, Product, UpdateProduct};
 use crate::state::AppState;
 use crate::handlers::auth_handlers::{extract_claims, require_role};
 
-/*pub async fn index() -> impl Responder {
-    HttpResponse::Ok()
-        .content_type("text/plain; charset=utf-8")
-        .body("Главная страница")
-}*/
 
 pub async fn get_products(req: HttpRequest, data: web::Data<AppState>) -> impl Responder {
     let claims = match extract_claims(&req) {
@@ -23,7 +18,11 @@ pub async fn get_products(req: HttpRequest, data: web::Data<AppState>) -> impl R
 }
 
 pub async fn get_product(req: HttpRequest, path: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
-    if let Err(resp) = extract_claims(&req) {
+    let claims = match extract_claims(&req) {
+        Ok(c) => c,
+        Err(resp) => return resp,
+    };
+    if let Err(resp) = require_role(&claims, &["user", "seller", "admin"]) {
         return resp;
     }
     let id = path.into_inner();
